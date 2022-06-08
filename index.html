@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>飞机大战3.0</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <h2 class="score">分数：0</h2>
+  <div class="map">
+    <div class="feiji"></div>
+  </div>
+
+  <!-- <div class="show" style="display: none;">
+    <div class="container"></div>
+  </div> -->
+
+  <script>
+    const map = document.querySelector('.map')
+    const feiji = document.querySelector('.feiji')
+    const scoreEl = document.querySelector('.score')
+    let score = 0
+    let feijiX = 150 // 飞机位置
+    let feijiY = 600
+    let enemyList = []  // 敌人的element列表
+
+    // 元素移动
+    function elMove (el, x = 0, y = 0) {
+      el.style.left = x + 'px'
+      el.style.top = y + 'px'
+    }
+
+    // 生成子弹
+    function createBullet (el = feiji) {
+      const bullet = document.createElement('span')
+      if (el === feiji) {
+        bullet.setAttribute('class', 'bullet')
+      } else {
+        bullet.setAttribute('class', 'enemy-bullet')
+      }
+
+      // 子弹的初始位置，10 和 30 分别为子弹的宽高
+      let x = el === feiji ? parseFloat(el.style.left) + (feiji.offsetWidth / 2 - 5) : parseFloat(el.style.left) + (feiji.offsetWidth / 2)
+      let y = el === feiji ? feijiY - 30 : parseFloat(el.style.top) + el.offsetHeight
+      elMove(bullet, x, y)
+      map.appendChild(bullet)
+
+      // 子弹移动
+      const s = setInterval(() => {
+        if (el === feiji) {
+          y -= 20
+          elMove(bullet, x, y)
+
+          enemyList.find(enemy => {
+            const ex = parseFloat(enemy.style.left)
+            const ey = parseFloat(enemy.style.top)
+            // console.log(ex, x, ex + enemy.offsetWidth, ey, y, enemy.offsetHeight);
+            if (ex < x && x < ex + enemy.offsetWidth && ey < y && y < ey + enemy.offsetHeight) {
+              map.removeChild(enemy)
+              bz(ex + enemy.offsetWidth, ey + enemy.offsetHeight)
+              clearInterval(s)
+              map.removeChild(bullet)
+              score++
+              scoreEl.innerHTML = "分数：" + score
+              return true
+            }
+          })
+        } else {
+          y += 20
+          elMove(bullet, x, y)
+
+          if (feijiX < x && x < feijiX + feiji.offsetWidth && feijiY < y && y < feijiY + feiji.offsetHeight) {
+            bz(feijiX, feijiY)
+            map.removeChild(feiji)
+            setTimeout(() => {
+              alert("你输了，点击确定重新开始")
+              location.reload();
+            }, 1000)
+            // map.removeChild(enemy)
+            // bz(ex + enemy.offsetWidth, ey + enemy.offsetHeight)
+            // clearInterval(s)
+            // map.removeChild(bullet)
+          }
+        }
+
+        if (y <= 0 || y > 700) {
+          clearInterval(s)
+          map.removeChild(bullet)
+        }
+      }, 100);
+    }
+
+    // 生成敌人
+    function createEnemy () {
+      const enemy = document.createElement('span')
+      enemy.setAttribute('class', 'enemy')
+
+      const x = Math.random() * 300
+      const y = Math.random() * 450
+      elMove(enemy, x, y)
+      map.appendChild(enemy)
+      enemyList.push(enemy)
+
+      // 生成敌人的子弹
+      setInterval(() => {
+        if (enemy.parentElement === map) createBullet(enemy);
+      }, 1000);
+    }
+
+    // 监听键盘控制移动
+    function keysFn (key) {
+      switch (key) {
+        case 'w':
+          feijiY += -10
+          elMove(feiji, feijiX, feijiY)
+          break;
+
+        case 's':
+          feijiY += 10
+          elMove(feiji, feijiX, feijiY)
+          break;
+
+        case 'a':
+          feijiX += -10
+          elMove(feiji, feijiX, feijiY)
+          break;
+
+        case 'd':
+          feijiX += 10
+          elMove(feiji, feijiX, feijiY)
+          break;
+      }
+    }
+
+    // 爆炸
+    function bz (x, y) {
+      const box = document.createElement('div')
+      const container = document.createElement('div')
+      box.setAttribute('class', 'box')
+      container.setAttribute('class', 'container')
+      box.appendChild(container)
+      let bx = 0
+      let by = 0
+      let i = 0
+      let j = 0
+      elMove(box, x, y)
+      map.appendChild(box)
+      const s = setInterval(() => {
+        if (i < 6) {
+          i++
+        } else {
+          i = 0
+          if (j < 6) {
+            j++
+          } else {
+            j = 0
+          }
+          by = -350 / 7 * j
+        }
+        bx = -350 / 7 * i
+        container.style.backgroundPosition = `${bx}px ${by}px`
+      }, 20)
+
+      setTimeout(() => {
+        map.removeChild(box)
+        clearInterval(s)
+      }, 980)
+    }
+
+    window.onload = () => {
+      // alert('W上 S下 A左 D右 移动')
+      // 初始位置
+      elMove(feiji, feijiX, feijiY)
+
+      // 监听键盘事件
+      document.onkeydown = (e) => {
+        keysFn(e.key)
+      }
+
+      // 生成子弹
+      setInterval(() => {
+        createBullet()
+      }, 300)
+
+      // 生成敌人
+      setInterval(() => {
+        createEnemy()
+      }, 800);
+
+      // 移动端控制飞机移动
+      feiji.ontouchstart = (e) => {
+        e.preventDefault()
+        const sx = e.touches[0].pageX
+        const sy = e.touches[0].pageY
+        let fx = feijiX
+        let fy = feijiY
+        feiji.ontouchmove = (e) => {
+          e.preventDefault()
+          x = e.touches[0].clientX - sx
+          y = e.touches[0].clientY - sy
+          feijiX = fx + x
+          feijiY = fy + y
+
+          elMove(feiji, feijiX, feijiY)
+        }
+        feiji.ontouchend = () => {
+          feiji.ontouchmove = null
+        }
+      }
+
+      alert("pc端 W S A D控制上下左右移动。移动端触摸飞机进行移动，移动端禁止浏览器双击放大、左滑返回上一页体验更佳\(^o^)/~")
+    }
+  </script>
+</body>
+
+</html>
