@@ -11,6 +11,7 @@
 
 <body>
   <h2 class="score">分数：0</h2>
+  <h2 class="number">敌机数量（上限50）：0</h2>
   <div class="map">
     <div class="feiji"></div>
   </div>
@@ -23,7 +24,9 @@
     const map = document.querySelector('.map')
     const feiji = document.querySelector('.feiji')
     const scoreEl = document.querySelector('.score')
+    const numberEl = document.querySelector('.number')
     let score = 0
+    let number = 0
     let feijiX = 150 // 飞机位置
     let feijiY = 600
     let enemyList = []  // 敌人的element列表
@@ -64,8 +67,10 @@
               bz(ex + enemy.offsetWidth, ey + enemy.offsetHeight)
               clearInterval(s)
               map.removeChild(bullet)
-              score++
+              score ++
               scoreEl.innerHTML = "分数：" + score
+              number --
+              numberEl.innerHTML = "敌机数量（上限50）：" + number
               return true
             }
           })
@@ -75,15 +80,7 @@
 
           if (feijiX < x && x < feijiX + feiji.offsetWidth && feijiY < y && y < feijiY + feiji.offsetHeight) {
             bz(feijiX, feijiY)
-            map.removeChild(feiji)
-            setTimeout(() => {
-              alert("你输了，点击确定重新开始")
-              location.reload();
-            }, 1000)
-            // map.removeChild(enemy)
-            // bz(ex + enemy.offsetWidth, ey + enemy.offsetHeight)
-            // clearInterval(s)
-            // map.removeChild(bullet)
+            gameOver()
           }
         }
 
@@ -104,6 +101,11 @@
       elMove(enemy, x, y)
       map.appendChild(enemy)
       enemyList.push(enemy)
+      number ++
+      if(number >= 50) {
+        return gameOver()
+      }
+      numberEl.innerHTML = "敌机数量（上限50）：" + number
 
       // 生成敌人的子弹
       setInterval(() => {
@@ -169,6 +171,14 @@
         map.removeChild(box)
         clearInterval(s)
       }, 980)
+    }
+
+    function gameOver() {
+      map.removeChild(feiji)
+      setTimeout(() => {
+        alert("你输了，点击确定重新开始")
+        location.reload();
+      }, 1000)
     }
 
     window.onload = () => {

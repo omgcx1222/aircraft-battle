@@ -4,13 +4,13 @@
 }
 
 body {
-  background-color: #ccc;
+  background-color: #fff;
 }
 
 .map {
   width: 350px;
   height: 700px;
-  background-color: #fff;
+  background-color: #ccc;
   position: relative;
 }
 
@@ -20,7 +20,7 @@ body {
   width: 35px;
   height: 50px;
   background-color: skyblue;
-  background: url('./feiji.png') no-repeat;
+  background: url('./img/feiji.png') no-repeat;
   background-size: cover;
   /* border: 50px solid red;
   border-top-color: transparent;
@@ -34,7 +34,7 @@ body {
   width: 10px;
   height: 30px;
   background-color: red;
-  background: url('./daodan.png') no-repeat;
+  background: url('./img/daodan.png') no-repeat;
   background-size: cover;
 }
 
@@ -43,7 +43,7 @@ body {
   width: 10px;
   height: 30px;
   background-color: black;
-  background: url('./daodan2.png') no-repeat;
+  background: url('./img/daodan2.png') no-repeat;
   background-size: cover;
   transform: rotate(180deg);
 }
@@ -53,7 +53,7 @@ body {
   width: 50px;
   height: 50px;
   background-color: black;
-  background: url(./feiji2.png) no-repeat;
+  background: url('./img/feiji2.png') no-repeat;
   background-size: cover;
 }
 
@@ -67,7 +67,7 @@ body {
 .container {
   width: 350px;
   height: 350px;
-  background: url('./爆炸.png') no-repeat;
+  background: url('./img/爆炸.png') no-repeat;
   background-size: cover;
   background-position: -0px -0px;
 }
